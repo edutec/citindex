@@ -1,8 +1,44 @@
-//searchEngine = require('./search');
-//searchEngine.search('canbus','datasheet','microcontrollers', function(response) {
-//	console.log(response);
-//})
-//
+/*  ===========================================================
+ *  CitIndex - WebApp Module
+ *  ===========================================================
+ *  date: 	16/12/2013
+ *  author: Bernat Romagosa
+ *  -----------------------------------------------------------
+ *
+ *  Description
+ *  ***********
+ *
+ *  WebApp that lets you upload and index documents by their
+ *  content, if the filetype is suported, and by tags and title
+ *  in any case.
+ *
+ *  Documents are also classified by project, and a permission
+ *  system controls who can upload and search for what.
+ *
+ *  
+ *  Entry Points
+ *  ************
+ *
+ *  /
+ *  Root entry point. Displays the main page.
+ *
+ */
 
+searchEngine = require('./search');
+indexer = require('./index');
+//searchEngine.search('canbus','datasheet','microcontrollers', function(response) { console.log(response) })
 
-console.log({test: "                           Laboratorios Ciudadanos.\n                     Una herramienta de Cohesión Social.\nLa visión de esta herramienta\nEn un mundo en transformación donde los activos reales y la forma de valorarlos están cambiando de forma constante, parece lógico poner en marcha sistemas que se adapten a este nuevo formato.\nPara centrar estos modelos podemos partir de una premisa que nos ayude a idear un modelo de trabajo:\nEn este nuevo modelo social, y en especial con el acceso al conocimiento que aportan las nuevas tecnologías, el ciudadano toma un papel relevante en procesos que hasta el momento no estaban abiertos para él. En especial los procesos de innovación.\nDesde esta perspectiva, entendemos que es necesaria la creación de espacios donde el ciudadano pueda tanto desarrollar estas habilidades como ponerla en práctica. De esta forma podemos trabajar en la mejora del desarrollo económico y social de las personas.\nSe trata pues de crear un espacio donde los ciudadanos adquieran y desarrollen las habilidades y conocimientos necesarios que les permiten tanto crear proyectos y artefactos innovadores de transformación de su realidad, como de introducirse en un nuevo modelo social con garantías de desarrollo personal.\nSu funcionamiento\nEl funcionamiento de este tipo de espacios se divide en las siguientes etapas:\nDiseño. Es necesario por parte de los impulsores de la idea trabajar en las siguientes líneas:\nConstitución: Creación de una entidad con la aportación tanto del sector público como del privado.\nArraigo: Búsqueda de los aspectos sociales que motivan y calan en el tejido social y asociativo del territorio base al que se quiere dirigir la actividad.\nEstructura: Captura del conocimiento necesario para el desarrollo de actividades, tanto en formato de metodologías, técnicas, talleres, etc...\nConcepción: Añadir al apartado anterior todos los elementos logísticos y de modelo de funcionamiento necesarios para tener una visión de los recursos necesarios en los 3 primeros años y la forma de gestionarlos y conseguirlos.\nArranque. Es el primer periodo de trabajo en puertas abiertas y se pueden definir dentro de los dos primeros años de trabajo de este tipo de espacios.\nSe caracteriza por la necesidad de atraer ciudadanos a este tipo de espacios, enseñar las posibilidades del mismo y ser hábiles y flexibles en el funcionamiento para adaptarlo a sus inquietudes y formatos reales, a su cultura y forma de hacer.\nEn esta etapa el desarrollo de talleres para aprendizaje de herramientas (especialmente introducción a las TIC, sensorización y robótica) es una excelente línea de trabajo.\nEl objetivo final de esta etapa es la creación de proyectos innovadores desde este espacio y liderados por los ciudadanos que trabajan en él.\nLa constante monitorización de lo que sucede en este espacio y el replanteamiento del modelo se hacen fundamentales durante este periodo.\nCrecimiento. Es el momento de comenzar a fortalecer todos los proyecto y valores que se han ido incorporando durante la etapa anterior.\nLo razonable es aportar dos elementos esenciales en este momento a los ciudadanos y a sus proyectos:\nConocimiento. Desde una perspectiva global, para que puedan ahondar en aquello que quieren transformar y que no se quede solo en un intento más de realizar algo.\nConexión. Posibilidades de trabajar con personas o grupos que aporten nuevas visión, difusión y diseminación del trabajo que se está haciendo, tanto como laboratorio ciudadano como para los propios proyectos que se realizan dentro de él.\nEn esta fase es importante comenzar a concretar el conocimiento generado y como este puede ser explotado tanto por las personas que acuden al laboratorio, como por la propia entidad para generar ingresos que le permitan la sostenibilidad económica.\nRedefinición. Es difícil que desde el primer día se tenga una visión clara de que tipo de actividades encajarán en el modelo o que actores se acercarán a él.\nPor eso es importante al finalizar los periodos anteriores abrir una revisión que sitúe a este tipo de laboratorios en su realidad tras una fase de actividad y co-creación con los verdaderos usuarios de este modelo\nNuestra Propuesta\nCitiLab, como centro de referencia europeo en este tipo de espacios, propone este método de creación de los mismos partiendo de su propia experiencia y de la rigurosa visión de investigación realizada, tanto por personal propio como investigadores externos, sobre nuestra actividad.\nCreemos que incluir estos espacios dentro de las redes en las que CitiLab se mueve en estos momentos es un factor de éxito para el desarrollo de los mismos. Buscamos ahora un diálogo que permita definir a entidades que quieren recorrer este camina la manera de colaborar conjuntamente en el crecimiento común\n"}.test)
+var app = require('express')();
+
+app.get('/', function(request, response){
+	response.render('index.ejs')
+});
+
+app.get('/search/:project/:datatype/:query',function (request, response) {
+	searchEngine.search(request.params.project, request.params.datatype, request.params.query, function(results) {
+		console.log(results);
+		response.render('search-results.ejs', { results: results })
+	})
+});
+
+app.listen(8080)
