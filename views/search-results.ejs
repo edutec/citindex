@@ -1,0 +1,17 @@
+<html>
+	<head>
+		<script src='//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js'></script>
+	</head>
+	<body>
+		<div id='results'>
+			<b>Results</b>
+		</div>
+		<script>
+			var results = <%-JSON.stringify(results)%>;
+			
+			results.forEach(function(result) {
+				$('#results').append(result.fields.path)
+			})
+		</script>
+	</body>
+</html>
