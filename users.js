@@ -19,7 +19,7 @@
  */
 
 module.exports = {
-	addUser: 
+	add: 
 		function(username, firstName, surname, passwordHash, callback) { 
 			add(username, firstName, surname, passwordHash, callback)
 		}
@@ -120,18 +120,23 @@ process.argv.forEach( function(value, index, array) {
 				break;
 		}
 	}
-	if (username && firstName && surname && password) {
-		add(username, firstName, surname, password, function(success, response) {
-			if (success) {
-				console.log('Added user with username ' + username + '.')
-			} else {
-				console.log(response)
-			}
-		})
-	} else if (username) {
-		searchByUsername(username, function(response) { 
-			console.log(response) 
-		}) 
+	
+	if (index == array.length - 1) {
+
+		if (username && firstName && surname && password) {
+			add(username, firstName, surname, password, function(success, response) {
+				if (success) {
+					console.log('Added user with username ' + username + '.')
+				} else {
+					console.log(response)
+				}
+			})
+		} else if (username) {
+			searchByUsername(username, function(response) { 
+				console.log(response) 
+			}) 
+		}
+
 	}
 });
 

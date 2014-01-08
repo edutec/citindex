@@ -16,15 +16,15 @@
  *  Public functions
  *  ****************
  *
- *  index(projectString, dataTypeString, filePathString,
+ *  index(projectString, usernameString, filePathString,
  *  	callback(successBoolean, idString))
  *
  */
 
 module.exports = {
 	index: 
-		function(project, dataType, filePath, callback) { 
-			privateIndex(project, dataType, filePath, callback);
+		function(project, username, filePath, callback) { 
+			privateIndex(project, username, filePath, callback);
 		}
 }
 
@@ -33,18 +33,34 @@ module.exports = {
 
 var request = require('request');
 var extractor = require('./extract');
+var projectManager = require('./projects');
+var userManager = require('./users');
 
 
-function privateIndex(project, dataType, filePath, callback) {
+function privateIndex(project, username, filePath, callback) {
+	projectManager.exists(project, function(exists) {
+		if (!exists) { 
+			callback(false, 'Project ' + project + ' does not exist!');
+			return;
+		}
+	});
+	
+	projectManager.userCanContribute(username, project, function(canContribute) {
+		if (!canContribute) { 
+			callback(false, 'User ' + username + ' cannot contribute to ' + project + '!');
+			return;
+		}
+	})
+
 	extractor.extract(filePath, function(content, title) {
-		generateIndex(content, title, callback) // ← function(success, id)
+		generateIndex(content, title, project, username, callback) // ← function(success, id)
 	})
 }
 
 
 // Index Generation
 
-function generateIndex(content, title, callback) {
+function generateIndex(content, title, project, username, callback) {
 
 	var jsonData = { 
 		title: title,
@@ -54,7 +70,7 @@ function generateIndex(content, title, callback) {
 	};
 
 	var requestOptions = {
-		uri: 'http://localhost:9200/' + project + '/' + dataType + '/',
+		uri: 'http://localhost:9200/' + project + '/' + username + '/',
 		method: 'POST',
 		json: jsonData
 	};
@@ -69,7 +85,7 @@ function generateIndex(content, title, callback) {
 // Command line usage with arguments support
 
 var project;
-var dataType;
+var username;
 var tags = [];
 var filePath;
 
@@ -81,8 +97,8 @@ process.argv.forEach( function(value, i, array) {
 			case '--project': case '-p':
 				project = argument[1];
 				break;
-			case '--datatype': case '-d':
-				dataType = argument[1];
+			case '--username': case '-u':
+				username = argument[1];
 				break;
 			case '--tags': case '-t':
 				tags = argument[1].split(',');
@@ -93,14 +109,18 @@ process.argv.forEach( function(value, i, array) {
 		}
 	}
 
-	if (project && dataType && filePath) {
-		privateIndex(project, dataType, filePath, function(success, id) { 
-			if(success) { 
-				console.log(id)
-			} else {
-				console.log('File ' + filePath + ' could not be indexed')
-			}
-		}) 
+	if (index == array.length - 1) {
+
+		if (project && username && filePath) {
+			privateIndex(project, username, filePath, function(success, id) { 
+				if(success) { 
+					console.log(id)
+				} else {
+					console.log('File ' + filePath + ' could not be indexed')
+				}
+			}) 
+		}
+	
 	}
 
 });

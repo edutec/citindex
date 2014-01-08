@@ -14,13 +14,22 @@
  *  ****************
  *
  *  addProject(projectNameString, usernameString, callback)
+ *  projectExists(projectNameString)
  *
  */
 
 module.exports = {
-	addProject: 
+	add: 
 		function(projectName, username, callback) { 
 			add(projectName, username, callback)
+		},
+	exists:
+		function(projectName, callback) {
+			existsWithName(projectName, callback)
+		},
+	userCanContribute: 
+		function(username, projectName, callback) {
+			userCanContribute(username, projectName, callback)
 		}
 }
 
@@ -38,11 +47,11 @@ function add(projectName, username, callback) {
 	
 	// We first confirm no project with this name already exists
 	
-	existsWithName(projectName, username, function(exists) {
+	existsWithName(projectName, function(exists) {
 		if (exists) {
-			primitiveAdd(projectName, callback) 
-		} else {
 			callback(false, 'A project with this name already exists!')
+		} else {
+			primitiveAdd(projectName, username, callback) 
 		}
 	});
 
@@ -54,19 +63,25 @@ function add(projectName, username, callback) {
 		};
 
 		var requestOptions = {
-			uri: 'http://localhost:9200/' + projectName + '/sys.users',
+			uri: 'http://localhost:9200/' + projectName + '/sys.user',
 			method: 'POST',
 			json: jsonData
 		};
 
 		request(requestOptions, function(err, response, responseBody) {
+
 			if (err) throw err;
-			callback(true, responseBody._id)
+
+			if (responseBody.error) { 
+				callback(false, responseBody.error);
+			} else {
+				callback(true, responseBody._id)
+			}
 	})};
 }
 
 
-// Searching for projects
+// Testing
 
 function existsWithName(projectName, callback) {
 
@@ -95,11 +110,36 @@ function existsWithName(projectName, callback) {
 
 }
 
+function userCanContribute(username, projectName, callback) {
+	options = {
+		host: 'localhost',
+		port: '9200',
+		path: projectName + '/sys.user/_search?q=username:' + username,
+		method: 'GET'
+	}
+
+	http.get(options, function(response) {
+		var data = '';
+		response.on('data', function(chunk) {
+			data += chunk;
+		});
+
+		response.on('end', function() {
+			jsonData = JSON.parse(data);
+			if (jsonData.hits.total == 0) {
+				callback(false)
+			} else {
+				callback(true)
+			}
+		})
+	})	
+}
 
 // Command line usage with arguments support
 
 var projectName;
 var username;
+var projectNameQuery;
 
 process.argv.forEach( function(value, index, array) {
 
@@ -108,7 +148,7 @@ process.argv.forEach( function(value, index, array) {
 	if (argument.length == 2) {
 		switch(argument[0]) {
 			case '--search': case '-s':
-				projectName = argument[1];
+				projectNameQuery = argument[1];
 				break;
 			case '--add': case '-a':
 				projectName = argument[1];
@@ -118,18 +158,27 @@ process.argv.forEach( function(value, index, array) {
 				break;
 		}
 	}
-	if (projectName && username) {
-		add(projectName, username, function(success, response) {
-			if (success) {
-				console.log('Added project with name ' + username + '.')
-			} else {
+	
+	if (index == array.length - 1) {
+
+		if (projectName && username) {
+			add(projectName, username, function(success, response) {
+				if (success) {
+					console.log('Added project with name ' + projectName + '.')
+				} else {
+					console.log(response)
+				}
+			})
+		} else if (projectNameQuery && username) {
+			userCanContribute(username, projectNameQuery, function(response) {
 				console.log(response)
-			}
-		})
-	} else if (projectName) {
-		existsWithName(projectName, function(response) { 
-			console.log(response) 
-		}) 
+			})
+		} else if (projectNameQuery) {
+			existsWithName(projectNameQuery, function(response) { 
+				console.log(response) 
+			}) 
+		}
+
 	}
 });
 

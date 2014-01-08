@@ -80,10 +80,14 @@ process.argv.forEach( function(value, index, array) {
 		}
 	}
 
-	if (project && dataType && queryString) {
-		search(project, dataType, queryString, function(response) { 
-			console.log(response) 
-		}) 
+	if (index == array.length - 1) {
+
+		if (project && dataType && queryString) {
+			search(project, dataType, queryString, function(response) { 
+				console.log(response) 
+			}) 
+		}
+	
 	}
 
 });
