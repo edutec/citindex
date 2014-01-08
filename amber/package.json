@@ -1,0 +1,48 @@
+{
+  "name": "amber",
+  "version": "0.12.2",
+  "description": "An implementation of the Smalltalk language that runs on top of the JS runtime.",
+  "homepage": "http://amber-lang.net",
+  "keywords": [
+    "javascript",
+    "smalltalk",
+    "language",
+    "compiler",
+    "web"
+  ],
+  "author": {
+    "name": "Nicolas Petton",
+    "email": "petton.nicolas@gmail.com",
+    "url": "http://www.nicolas-petton.fr"
+  },
+  "license": {
+    "type": "MIT"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/amber-smalltalk/amber.git#0.12.2"
+  },
+  "engines": {
+    "node": ">=0.8.0"
+  },
+  "bin": {
+    "amber": "./cli/support/amber-cli.js",
+    "amberc": "./cli/support/amberc-cli.js"
+  },
+  "scripts": {
+    "test": "grunt amberc:amber_test_runner && node ./test/amber_test_runner.js"
+  },
+  "devDependencies": {
+    "pegjs": "~0.7.0",
+    "grunt": "~0.4.0",
+    "grunt-contrib-jshint": "~0.3.0",
+    "amdefine": "0.0.8"
+  },
+  "readme": "Amber [![Travis CI Status](https://secure.travis-ci.org/amber-smalltalk/amber.png)](https://travis-ci.org/#!/amber-smalltalk/amber)\n=====\n\nBy Nicolas Petton <petton.nicolas@gmail.com> and [Amber contributors](https://github.com/NicolasPetton/amber/contributors)\n\nAmber is an implementation of the Smalltalk language that runs on top of the JavaScript runtime. It is designed to make client-side development faster and easier.\n\nOverview\n--------\n\nAmber is written in itself, including the parser and compiler. Amber compiles into efficient JavaScript, mapping one-to-one with the equivalent JavaScript. There is no interpretation at runtime.\n\nSome highlights:\n\n-    Amber features an IDE with a Class browser, Workspace, Transcript, a ReferencesBrowser supporting senders/implementors and class references, basic Inspector and even a beginning of a Debugger and a unit TestRunner.\n-    [Pharo Smalltalk](http://www.pharo-project.org) is considered as the reference implementation.\n-    Amber includes a canvas to generate HTML, like [Seaside](http://www.seaside.st)\n-    Amber can use Javascript libraries and the current IDE is built on [jQuery](http://www.jquery.com)\n-    You can inline Javascript code and there are many ways to interact between Amber and Javascript\n\n\nLicense\n-------\n\nAmber is released under the MIT license. All contributions made for inclusion are considered to be under MIT.\n\nBuilding Amber\n--------------\n\nThis step is only used by people developing Amber itself.\nPlease refer to [CONTRIBUTING.md](CONTRIBUTING.md) for further details.\nIt explains the Amber development setup and how to contribute.\n\n\nMore infos\n----------\n\nMore on the [project page](http://amber-lang.net)\n",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/amber-smalltalk/amber.git#0.12.2/issues"
+  },
+  "_id": "amber@0.12.2",
+  "_from": "amber@"
+}

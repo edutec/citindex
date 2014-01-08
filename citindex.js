@@ -28,7 +28,17 @@ searchEngine = require('./search');
 indexer = require('./index');
 //searchEngine.search('canbus','datasheet','microcontrollers', function(response) { console.log(response) })
 
-var app = require('express')();
+var express = require('express');
+var app = express();
+
+app.all('*', function(req, res, next){
+  if (!req.get('Origin')) return next();
+  res.set('Access-Control-Allow-Origin', '*');
+  next();
+});
+
+app.use('/docs', express.static(__dirname + '/docs'));
+app.use('/', express.static(__dirname + '/amber'));
 
 app.get('/', function(request, response){
 	response.render('index.ejs')
@@ -37,7 +47,7 @@ app.get('/', function(request, response){
 app.get('/search/:project/:datatype/:query',function (request, response) {
 	searchEngine.search(request.params.project, request.params.datatype, request.params.query, function(results) {
 		console.log(results);
-		response.render('search-results.ejs', { results: results })
+		response.send(results);
 	})
 });
 
