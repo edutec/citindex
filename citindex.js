@@ -1,54 +1,84 @@
 /*  ===========================================================
- *  CitIndex - WebApp Module
+ *  CitIndex - Main Module
  *  ===========================================================
- *  date: 	16/12/2013
+ *  date: 	10/01/2013
  *  author: Bernat Romagosa
  *  -----------------------------------------------------------
  *
  *  Description
  *  ***********
  *
- *  WebApp that lets you upload and index documents by their
- *  content, if the filetype is suported, and by tags and title
- *  in any case.
- *
- *  Documents are also classified by project, and a permission
- *  system controls who can upload and search for what.
- *
- *  
- *  Entry Points
- *  ************
- *
- *  /
- *  Root entry point. Displays the main page.
  *
  */
 
-searchEngine = require('./search');
-indexer = require('./index');
-//searchEngine.search('canbus','datasheet','microcontrollers', function(response) { console.log(response) })
 
-var express = require('express');
-var app = express();
+var request = require('request');
 
-app.all('*', function(req, res, next){
-  if (!req.get('Origin')) return next();
-  res.set('Access-Control-Allow-Origin', '*');
-  next();
-});
+function clearDatabase(callback) {
 
-app.use('/docs', express.static(__dirname + '/docs'));
-app.use('/', express.static(__dirname + '/amber'));
+	var requestOptions = {
+		uri: 'http://localhost:9200/_all',
+		method: 'DELETE',
+	};
 
-app.get('/', function(request, response){
-	response.render('index.ejs')
-});
+	request(requestOptions, function(err, response, responseBody) {
+		if (err) throw err;
+		callback(JSON.parse(responseBody).ok);
+	});
+}
 
-app.get('/search/:project/:datatype/:query',function (request, response) {
-	searchEngine.search(request.params.project, request.params.datatype, request.params.query, function(results) {
-		console.log(results);
-		response.send(results);
+
+function initializeDatabase() {
+
+	['sys.system'].forEach( function(value, index, array) {
+	
+		var requestOptions = {
+			uri: 'http://localhost:9200/' + value,
+			method: 'PUT',
+		};
+
+		request(requestOptions, function(err, response, responseBody) {
+			if (err) throw err;
+		});
+	
 	})
+	
+}
+
+
+// Command line usage with arguments support
+
+var project;
+var username;
+var tags = [];
+var filePath;
+
+process.argv.forEach( function(value, index, array) {
+	
+	var argument = value.split('=');
+	if (argument.length == 1) {
+		switch(argument[0]) {
+			case '--clear-database': 
+				clearDatabase( function(success) {
+					if (success) { 
+						console.log('Database was successfully cleared.')
+				} else { 
+						console.log('ERROR! Database could not be cleared!')
+					}
+				})
+				break;
+			case '--initialize': case '-i':
+				clearDatabase( function(success) {
+					if (success) {
+						initializeDatabase();
+						console.log('Database initialized. All indices created')
+					} else {
+						console.log('ERROR! Database could not be cleared, so I could not initialize it')
+					}
+				} )
+				break;
+		}
+	}
+
 });
 
-app.listen(8080)

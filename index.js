@@ -89,7 +89,7 @@ var username;
 var tags = [];
 var filePath;
 
-process.argv.forEach( function(value, i, array) {
+process.argv.forEach( function(value, index, array) {
 	
 	var argument = value.split('=');
 	if (argument.length == 2) {

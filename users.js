@@ -14,14 +14,14 @@
  *  ****************
  *
  *  addUser(usernameString, firstNameString, surnameString,
- *  		passwordMD5Hash, callback)
+ *  		passwordMD5hash, callback)
  *
  */
 
 module.exports = {
 	add: 
-		function(username, firstName, surname, passwordHash, callback) { 
-			add(username, firstName, surname, passwordHash, callback)
+		function(username, firstName, surname, password, callback) { 
+			add(username, firstName, surname, password, callback)
 		}
 }
 
@@ -124,7 +124,9 @@ process.argv.forEach( function(value, index, array) {
 	if (index == array.length - 1) {
 
 		if (username && firstName && surname && password) {
-			add(username, firstName, surname, password, function(success, response) {
+			var crypto = require('crypto');
+			var passwordHash = crypto.createHash('md5').update(password).digest('hex');
+			add(username, firstName, surname, passwordHash, function(success, response) {
 				if (success) {
 					console.log('Added user with username ' + username + '.')
 				} else {
